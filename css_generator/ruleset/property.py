@@ -1,4 +1,3 @@
-from abc import abstractmethod
 
 
 class Property:
@@ -23,6 +22,9 @@ class Property:
     @value.setter
     def value(self, value):
         self._value = value
+
+    def css(self):
+        return f"{self.name}: {self.value};"
 
     def to_dict(self):
         pass
