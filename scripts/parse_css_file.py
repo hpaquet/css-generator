@@ -1,6 +1,3 @@
-from css_generator.ruleset.stylesheet import StyleSheet
-from css_generator.parser import parser
+from css_generator import parser
 
-stylesheet = StyleSheet()
-
-style = parser.from_file(path='style.css', stylesheet=stylesheet)
+style = parser.from_file(path='style.css')

@@ -10,9 +10,9 @@ TAB = "\t"
 
 
 class Rule(MutableSequence):
-    """Sequence of rules that represent a stylesheet"""
+    """Sequence of properties that represent a style rule"""
 
-    def __init__(self, properties=None, rule_selector=None, rule_type=None, pseudo_class=None, *args):
+    def __init__(self, properties=None, rule_selector=None, rule_type='element', pseudo_class=None, *args):
         self.properties = list()
         self.extend(list(args))
         self.type = rule_type
@@ -75,9 +75,12 @@ class Rule(MutableSequence):
         if values is None:
             return
 
+        elif isinstance(values, Property) | isinstance(values, Rule):
+            self.add_property(values)
+
         elif isinstance(values, dict):
             for k, v in values.items():
-                self.add_property({'name': k, 'value': v})
+                self.add_property({k: v})
 
         elif isinstance(values, list):
             for item in values:
@@ -85,7 +88,8 @@ class Rule(MutableSequence):
 
     def add_property(self, property):
         if isinstance(property, dict):
-            return self.append(Property(name=property['name'], value=property['value']))
+            for name, value in property.items():
+                self.append(Property(name=name, value=value))
 
         elif isinstance(property, Property) | isinstance(property, Rule):
             self.append(property)
@@ -93,12 +97,14 @@ class Rule(MutableSequence):
     def css(self):
         style = ''
 
-        style += ', \n'.join([f"{getattr(RuleTypes, self.type.upper()).value}{s}{':'.join(self.pseudo_class)}" for s in self.selector])
+        type_selector = getattr(RuleTypes, self.type.upper()).value
+
+        style += NEW_LINE + ', \n'.join([f"{type_selector}{s}{':'.join(self.pseudo_class)}" for s in self.selector])
         style += f" {LEFT_CURLY_BRAKET} {NEW_LINE}"
 
         for property in self.properties:
             if isinstance(property, Property):
-                style += TAB + f"{property.name}: {property.value};" + NEW_LINE
+                style += TAB + property.css() + NEW_LINE
             elif isinstance(property, Rule):
                 style += TAB
                 style += property.css().replace(NEW_LINE, NEW_LINE + TAB)
@@ -119,22 +125,4 @@ if __name__ == '__main__':
         }
     )
 
-    a_hover = Rule(
-        rule_selector='a',
-        pseudo_class='hover',
-        rule_type='element',
-        properties={
-            'color': '#0FA0CE',
-        }
-    )
-
-    rule = Rule(
-        rule_selector='(min-width: 400px)',
-        rule_type='media',
-        properties=[
-            container,
-            a_hover
-        ]
-    )
-
-    print(rule.css())
+    print(container.css())

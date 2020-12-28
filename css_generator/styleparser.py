@@ -3,6 +3,17 @@ import re
 from css_generator.ruleset.rule import Rule
 
 
+def get_rule_type(s):
+    if s == '#':
+        return 'ID'
+    elif s == '.':
+        return 'CLASS'
+    elif s == '@':
+        return 'MEDIA'
+
+    return 'ELEMENT'
+
+
 class StyleParser:
 
     def __init__(self):
@@ -58,16 +69,7 @@ class StyleParser:
 
             if (start_rule is None) & (c != '\n'):
                 start_rule = i
-                rule_type = 'ELEMENT'
-
-                if c == '.':
-                    rule_type = 'CLASS'
-
-                elif c == '@':
-                    rule_type = 'MEDIA'
-
-                elif c == '#':
-                    rule_type = 'ID'
+                rule_type = get_rule_type(c)
 
             if c == '{':
                 open_bracket += 1
@@ -110,15 +112,9 @@ class StyleParser:
 
     def _convert_rule(self, name, properties):
 
-        type = 'element'
-        if name[0] == '#':
-            type = 'id'
-        elif name[0] == '.':
-            type = 'class'
-        elif name[0] == '@':
-            type = 'media'
+        rule_type = get_rule_type(name[0])
 
-        if type == 'media':
+        if rule_type == 'MEDIA':
             sub_rules = properties
             properties = []
             for media_rule_name, media_rule_properties in sub_rules.items():

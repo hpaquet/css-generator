@@ -16,12 +16,4 @@ container = Rule(
     }
 )
 
-columns = Rule(
-    rule_selector=['column', 'columns'],
-    rule_type='class',
-    properties={
-        'width': '100 %',
-        'float': 'left',
-        'box-sizing': 'border-box',
-    }
-)
+stylesheet.add_rule(container)
